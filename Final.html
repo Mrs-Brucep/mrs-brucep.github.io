@@ -25,10 +25,10 @@ int points = 0;
 int px, py;
 boolean up = true, down = true, left = true, right = true;
 int set = 50;
-
+PImage backImg; 
 
 void setup() {
-    
+     backImg = loadImage("./back2.png");
   size(600, 600);
   px = width/2-10;
   py = height/2-10;
@@ -50,6 +50,7 @@ void setup() {
 
 void draw() {
   background(0);
+   image(backImg,0,10);
   for (int i = 0; i < coinx.length; i++) {
     if (ctd[i]) {
       stroke(255, 255, 0);
