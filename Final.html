@@ -1,0 +1,197 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Processing Demo</title>
+<script type="text/javascript" src="js/processing.js"></script>
+</head>
+
+<body>
+<script type="text/processing">
+//processing|Set-8|25-point_problem
+//A.K.A. Coin Hunt!
+//Navigate the Maze and Collect as many Coins as Possible.
+//DON'T GET STUCK! WATCH OUT FOR THE INVISIBLE WALLS
+//You might have to click on the window to play.
+ 
+int[] h = new int[500];
+int[] hw = new int[500];
+int[] x = new int[500];
+int[] v = new int[500];
+int[] vw = new int[500];
+int[] y = new int[500];
+float[] coinx = new float[4];
+float[] coiny = new float[coinx.length];
+boolean[] ctd = new boolean[coinx.length];
+int points = 0;
+int px, py;
+boolean up = true, down = true, left = true, right = true;
+int set = 50;
+
+
+void setup() {
+    
+  size(600, 600);
+  px = width/2-10;
+  py = height/2-10;
+  for (int i = 0; i < v.length; i++) {
+    v[i] = (int)random(width);
+    vw[i] = (int)random(set);
+    x[i] = (int)random(20)*30;
+    h[i] = (int)random(width);
+    hw[i] = (int)random(set);
+    y[i] = (int)random(20)*30;
+  }
+  for (int i = 0; i < coinx.length; i++) {
+    coinx[i] = (int)random(width);
+    coiny[i] = (int)random(height);
+    ctd[i] = true;
+  }
+  
+}
+
+void draw() {
+  background(0);
+  for (int i = 0; i < coinx.length; i++) {
+    if (ctd[i]) {
+      stroke(255, 255, 0);
+    } else {
+      stroke(0);
+    }
+    strokeWeight(4);
+    point(coinx[i], coiny[i]);
+    if (ctd[i] && (dist(px, py, coinx[i], coiny[i]) <= 4)) {
+      ctd[i] = false;
+      points++;
+    }
+    if (coinx[i] < 0) {
+      coinx[i] = width;
+      coiny[i] = (int)random(height);
+      ctd[i] = true;
+    }
+    if (coinx[i] > width) {
+      coinx[i] = 0;
+      coiny[i] = (int)random(height);
+      ctd[i] = true;
+    }
+    if (coiny[i] < 0) {
+      coiny[i] = height;
+      coinx[i] = (int)random(width);
+      ctd[i] = true;
+    }
+    if (coiny[i] > height) {
+      coiny[i] = 0;
+      coinx[i] = (int)random(width);
+      ctd[i] = true;
+    }
+  }
+  for (int i = 0; i < v.length; i++) {
+    fill(0, 0, 255);
+    noStroke();
+    rect(x[i], v[i], 15, vw[i]);
+    rect(h[i], y[i], hw[i], 15);
+    if (x[i] + 15 < 0) {
+      x[i] = width;
+      v[i] = (int)random(width);
+      vw[i] = (int)random(set);
+    }
+    if (h[i] + hw[i] < 0) {
+      h[i] = width;
+      hw[i] = (int)random(set);
+      y[i] = (int)random(20)*30;
+    }
+    if (x[i] > width) {
+      x[i] = -15;
+      v[i] = (int)random(width);
+      vw[i] = (int)random(set);
+    }
+    if (h[i] > width) {
+      hw[i] = (int)random(set);
+      y[i] = (int)random(20)*30;
+      h[i] = -hw[i];
+    }
+    if (v[i] + vw[i] < 0) {
+      v[i] = height;
+      vw[i] = (int)random(set);
+      x[i] = (int)random(20)*30;
+    }
+    if (y[i] + 15 < 0) {
+      y[i] = height;
+      h[i] = (int)random(width);
+      hw[i] = (int)random(set);
+    }
+    if (v[i] > height) {
+      vw[i] = (int)random(set);
+      x[i] = (int)random(20)*30;
+      v[i] = -vw[i];
+    }
+    if (y[i] > height) {
+      y[i] = -15;
+      h[i] = (int)random(width);
+      hw[i] = (int)random(set);
+    }
+    strokeWeight(2);
+    stroke(255);
+    point(px, py);
+    for (int e = 0; e < x.length; e++) {
+      if (((px == h[e]) && (py <= y[e] + 15) && (py >= y[e])) || ((px == x[e]) && (py <= v[e] + vw[e]) && (py >= v[e]))) {
+        right = false;
+      }
+      if (((px == h[e] + hw[e]) && (py <= y[e] + 15) && (py >= y[e])) || ((px == x[e] + 15) && (py <= v[e] + vw[e]) && (py >= v[e]))) {
+        left = false;
+      }
+      if (((py == v[e]) && (px <= x[e] + 15) && (px >= x[e])) || ((py == y[e]) && (py <= h[e] + hw[e]) && (py >= h[e]))) {
+        down = false;
+      }
+      if (((py == v[e] + vw[e]) && (px <= x[e] + 15) && (px >= x[e])) || ((py == y[e] + 15) && (py <= h[e] + hw[e]) && (py >= h[e]))) {
+        up = false;
+      }
+    }
+    if (keyPressed && (key == CODED)) {
+      if (up && (keyCode == UP)) {
+        y[i] += 1;
+        v[i] += 1;
+        for (int e = 0; e < coiny.length; e++) {
+         coiny[e] += 0.002;
+        }
+      }
+      if (down && (keyCode == DOWN)) {
+        y[i] -= 1;
+        v[i] -= 1;
+        for (int e = 0; e < coiny.length; e++) {
+         coiny[e] -= 0.002;
+        }
+      }
+      if (left && (keyCode == LEFT)) {
+        x[i] += 1;
+        h[i] += 1;
+        for (int e = 0; e < coinx.length; e++) {
+         coinx[e] += 0.002;
+        }
+      }
+      if (right && (keyCode == RIGHT)) {
+        x[i] -= 1;
+        h[i] -= 1;
+        for (int e = 0; e < coinx.length; e++) {
+         coinx[e] -= 0.002;
+        }
+      }
+    }
+    up = true;
+    down = true;
+    left = true;
+    right = true; 
+  }
+  fill(0);
+  strokeWeight(2);
+  stroke(255);
+  rect(500, 10, 60, 60);
+  fill(255);
+  textSize(30);
+  text(points, 500, 50);
+  textSize(50);
+  text("COIN HUNT", 50, 60);
+  text("Press Spacebar to move faster",50,100);
+}
+</script>
+<canvas id="sketch" style="border: 1px solid black;"></canvas>
+</body>
+</html>
